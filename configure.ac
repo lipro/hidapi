@@ -69,11 +69,6 @@ case $host in
 	os="linux"
 	threads="pthreads"
 
-	# HIDAPI/hidraw libs
-	PKG_CHECK_MODULES([libudev], [libudev], true, [hidapi_lib_error libudev])
-	LIBS_HIDRAW_PR+=" $libudev_LIBS"
-	CFLAGS_HIDRAW+=" $libudev_CFLAGS"
-
 	# HIDAPI/libusb libs
 	AC_CHECK_LIB([rt], [clock_gettime], [LIBS_LIBUSB_PRIVATE+=" -lrt"], [hidapi_lib_error librt])
 	PKG_CHECK_MODULES([libusb], [libusb-1.0 >= 1.0.9], true, [hidapi_lib_error libusb-1.0])
@@ -122,12 +117,9 @@ case $host in
 	AC_MSG_ERROR([HIDAPI is not supported on your operating system yet])
 esac
 
-LIBS_HIDRAW="${LIBS} ${LIBS_HIDRAW_PR}"
 LIBS_LIBUSB="${LIBS} ${LIBS_LIBUSB_PRIVATE}"
-AC_SUBST([LIBS_HIDRAW])
 AC_SUBST([LIBS_LIBUSB])
 AC_SUBST([CFLAGS_LIBUSB])
-AC_SUBST([CFLAGS_HIDRAW])
 
 if test "x$os" = xwindows; then
 	AC_DEFINE(OS_WINDOWS, 1, [Windows implementations])
@@ -214,7 +206,6 @@ AM_CONDITIONAL(OS_WINDOWS, test "x$os" = xwindows)
 AC_CONFIG_HEADERS([config.h])
 
 if test "x$os" = "xlinux"; then
-	AC_CONFIG_FILES([pc/hidapi-hidraw.pc])
 	AC_CONFIG_FILES([pc/hidapi-libusb.pc])
 else
 	AC_CONFIG_FILES([pc/hidapi.pc])
@@ -225,7 +216,6 @@ AC_SUBST(LTLDFLAGS)
 AC_CONFIG_FILES([Makefile \
 	hidtest/Makefile \
 	libusb/Makefile \
-	linux/Makefile \
 	mac/Makefile \
 	testgui/Makefile \
 	windows/Makefile])
